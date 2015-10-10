@@ -243,7 +243,31 @@
                 | false -> (t,head::f)
 
         let permute indexMap list = 
-            failwith "no idea for implementation"
+            let listLength = length list
+            let rec inMap index list =
+                match list with
+                | [] -> []
+                | head::tail -> 
+                    match (indexMap index) with
+                    | nIndex when nIndex < 0 || nIndex >= listLength -> raise (ArgumentOutOfRangeException())
+                    | nIndex -> (nIndex, head) :: (inMap (index+1) tail)
+             
+            let mappedList = inMap 0 list   
+            //check if all indexes are unique
+            let rec check list =
+                match list with
+                | [] -> true
+                | (index,item)::tail ->
+                    match (forall (fun (index2,_) -> index2<>index)tail) with
+                    | true -> check tail
+                    | false -> false
+
+            if (check mappedList) then
+                mappedList
+                |> List.sortBy (fun (index,item) -> index)
+                |> map (fun (_,item) -> item)
+            else
+                raise (ArgumentException("dubbele index"))
 
         let rec pick chooser list =
             match list with
