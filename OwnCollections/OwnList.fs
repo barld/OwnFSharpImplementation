@@ -310,3 +310,93 @@
             let projectedList = map (fun x -> (projection x, x)) list
             let sortedList = inSortBy projectedList
             map (fun (a,b)->b) sortedList
+
+        let rec sortWith comparer list =
+            match list with
+            | [] -> []
+            | head::tail -> 
+                let before = filter (fun x -> (comparer x head) = -1) tail
+                let after = filter (fun x -> comparer x head > -1) tail
+                concat [(sort before); [head];(sort after)]
+
+        let inline add a b = a+b
+
+        let rec sum (list : 'a list) : 'a =    
+            failwith "not generic after compiling" 
+            let zero:'a = LanguagePrimitives.GenericZero 
+            match list with
+            | [] -> zero
+            | head::tail -> (head + (sum tail)) :  'a
+
+        let rec sumBy projection list =
+            failwith "not generic"
+            match list with
+            | [] -> LanguagePrimitives.GenericZero
+            | head::tail -> (projection head) + (sumBy projection tail)
+
+        let tail list =
+            match list with
+            | [] -> raise (ArgumentException("The input list was empty"))
+            | _::tail -> tail
+
+        let toArray list =
+            Array.ofList list
+
+        let toSeq list =
+            Seq.ofList list
+
+        let rec tryFind predicate list =
+            match list with
+            | [] -> None
+            | head::tail ->
+                match (predicate head) with
+                | true -> Some head
+                | false -> tryFind predicate tail
+
+        let rec tryFindIndex predicate list =
+            match list with
+            | [] -> None
+            | head::tail ->
+                match (predicate head) with
+                | true -> Some 0
+                | false -> 
+                    match (tryFindIndex predicate tail) with
+                    | None -> None
+                    | Some(n) -> Some(n+1)
+            
+        let rec tryPick chooser list =
+            match list with
+            | [] -> None
+            | head::tail ->
+                match (chooser head) with
+                | None -> tryPick chooser tail
+                | Some(item) -> Some(item)
+
+        let rec unzip list = 
+            match list with
+            | [] -> ([],[])
+            | (a,b)::tail -> 
+                let c,d = unzip tail
+                (a::c,b::d)
+
+        let rec unzip3 list =
+            match list with
+            | [] -> ([],[],[])
+            | (a,b,c)::tail ->
+                let d,e,f = unzip3 tail
+                (a::d,b::e,c::f)
+
+        let rec zip list1 list2 =
+            match (list1,list2) with
+            | ([],[]) -> []
+            | ([],_) -> raise (ArgumentException("list is not of same length"))
+            | (_,[]) -> raise (ArgumentException("list is not of same length"))
+            | (head1::tail1,head2::tail2) -> (head1,head2)::zip tail1 tail2
+
+        let rec zip3 list1 list2 list3 =
+            match (list1,list2,list3) with
+            | ([],[],[]) -> []
+            | ([],_,_) -> raise (ArgumentException("list is not of same length"))
+            | (_,[],_) -> raise (ArgumentException("list is not of same length"))
+            | (_,_,[]) -> raise (ArgumentException("list is not of same length"))
+            | (head1::tail1,head2::tail2,head3::tail3) -> (head1,head2,head3)::zip3 tail1 tail2 tail3
