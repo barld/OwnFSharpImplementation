@@ -262,4 +262,7 @@
             | [] -> raise (ArgumentException("empty list"))
             | head::tail -> inReduce head tail
 
+        let reduceBack reduction list =
+            list |> List.rev |> reduce reduction
+
         
