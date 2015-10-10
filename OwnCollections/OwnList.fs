@@ -243,3 +243,23 @@
         let permute indexMap list = 
             failwith "no idea for implementation"
 
+        let rec pick chooser list =
+            match list with
+            | [] -> raise (KeyNotFoundException("key not found"))
+            | head::tail -> 
+                match (chooser head) with
+                | None -> pick chooser tail
+                | Some(value) -> value
+
+        let reduce reduction list =
+
+            let rec inReduce acc list =
+                match list with
+                | [] -> acc
+                | head::tail -> inReduce (reduction acc head) tail
+
+            match list with
+            | [] -> raise (ArgumentException("empty list"))
+            | head::tail -> inReduce head tail
+
+        
