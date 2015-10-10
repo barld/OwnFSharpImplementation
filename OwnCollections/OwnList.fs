@@ -265,4 +265,25 @@
         let reduceBack reduction list =
             list |> List.rev |> reduce reduction
 
-        
+        let rec replicate count initial =
+            match count with
+            | n when n < 0 -> raise (ArgumentException("count must be non negative"))
+            | 0 -> []
+            | _ -> initial :: replicate (count-1) initial
+
+        let rec rev list =
+            match list with
+            | [] -> []
+            | head::tail -> (rev tail) @ [head]
+
+        let rec scan folder state list =
+            match list with
+            | [] -> [state]
+            | head::tail -> state :: (scan folder (folder state head) tail)
+
+        let scanBack folder list state =
+            let rec inScanBack list state = 
+                match list with
+                | [] -> [state]
+                | head::tail -> (inScanBack tail (folder head state)) @ [state]
+            inScanBack (list |> rev) state
