@@ -189,7 +189,8 @@
                 match list with
                 | [] -> lastMax
                 | head::tail -> 
-                    if Operators.max (projection head) (projection lastMax) = (projection head) then
+                    let headProjection = (projection head)
+                    if Operators.max headProjection (projection lastMax) = headProjection then
                         maxByi projection head tail
                     else
                         maxByi projection lastMax tail
@@ -211,7 +212,8 @@
                 match list with
                 | [] -> lastMin
                 | head::tail -> 
-                    if Operators.min (projection head) (projection lastMin) = (projection head) then
+                    let headProjection =  (projection head)
+                    if Operators.min headProjection (projection lastMin) = headProjection then
                         minByi projection head tail
                     else
                         minByi projection lastMin tail
@@ -287,3 +289,24 @@
                 | [] -> [state]
                 | head::tail -> (inScanBack tail (folder head state)) @ [state]
             inScanBack (list |> rev) state
+
+        let rec sort list =
+            // simple quicksort algorithm
+            match list with
+            | [] -> []
+            | head::tail -> 
+                let before = filter (fun x -> (Operators.compare x head) = -1) tail
+                let after = filter (fun x -> Operators.compare x head > -1) tail
+                concat [(sort before); [head];(sort after)]
+
+        let sortBy projection list =
+            let rec inSortBy list = 
+                match list with
+                | [] -> []
+                | (projected,item)::tail ->
+                    let before = filter (fun (a,b) -> (Operators.compare a projected) = -1) tail
+                    let after = filter (fun (a,b) -> (Operators.compare a projected) > -1) tail
+                    concat [(inSortBy before);[(projected,item)];(inSortBy after)]
+            let projectedList = map (fun x -> (projection x, x)) list
+            let sortedList = inSortBy projectedList
+            map (fun (a,b)->b) sortedList
